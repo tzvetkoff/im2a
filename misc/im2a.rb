@@ -3,7 +3,7 @@ require 'formula'
 class Im2a < Formula
   homepage 'https://github.com/tzvetkoff/im2a'
   url 'git://github.com/tzvetkoff/im2a.git'
-  version '0.1.1'
+  version '0.1.2'
 
   depends_on 'imagemagick'
 
