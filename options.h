@@ -17,6 +17,7 @@ namespace im2a {
 	class Options {
 
 	private:
+		bool _html;
 		bool _invert;
 		int _width;
 		int _height;
@@ -33,6 +34,7 @@ namespace im2a {
 		
 		void help();
 
+		bool html() const;
 		bool invert() const;
 		int width() const;
 		int height() const;

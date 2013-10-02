@@ -10,9 +10,11 @@
 /* asciifier.cpp */
 
 #include <iostream>
+#include <iomanip>
 #include <string.h>
 #include <math.h>
 
+#include "version.h"
 #include "asciifier.h"
 
 // 256-color color values, hex
@@ -54,30 +56,33 @@ im2a::Asciifier::Asciifier(Options *options, TermInfo *term_info, Magick::Image 
 	_term_info = term_info;
 	_image = image;
 
-	// proportions to scale image to
-	int scale_wid, scale_hei;
+	// only scale the image if it's a terminal or width and height options are explicitly passed
+	if (!_options->html() || (_options->width() > 0 && _options->height() > 0)) {
+		// proportions to scale image to
+		int scale_wid, scale_hei;
 
-	if (_options->width() > 0 && _options->height() > 0) {
-		scale_wid = _options->width();
-		scale_hei = _options->height();
-	} else {
-		// try to fit height*2 first
-		double y_prop = (((double)_image->rows()) / ((double)_term_info->lines() - 1)) / 2.0;
-		scale_wid = round(_image->columns() / y_prop);
-		scale_hei = _term_info->lines() - 1;
+		if (_options->width() > 0 && _options->height() > 0) {
+			scale_wid = _options->width();
+			scale_hei = _options->height();
+		} else {
+			// try to fit height*2 first
+			double y_prop = (((double)_image->rows()) / ((double)_term_info->lines() - 1)) / 2.0;
+			scale_wid = round(_image->columns() / y_prop);
+			scale_hei = _term_info->lines() - 1;
 
-		// fit width (and halven result height)
-		if (scale_wid > _term_info->columns()) {
-			double x_prop = (((double)_image->columns()) / ((double)_term_info->columns() - 1));
-			scale_wid = _term_info->columns() - 1;
-			scale_hei = round((_image->rows() / x_prop) / 2.0);
+			// fit width (and halven result height)
+			if (scale_wid > _term_info->columns()) {
+				double x_prop = (((double)_image->columns()) / ((double)_term_info->columns() - 1));
+				scale_wid = _term_info->columns() - 1;
+				scale_hei = round((_image->rows() / x_prop) / 2.0);
+			}
 		}
-	}
 
-	// scale the image
-	char scale_str[32];
-	sprintf(scale_str, "%dx%d!", scale_wid, scale_hei);
-	_image->scale(scale_str);
+		// scale the image
+		char scale_str[32];
+		sprintf(scale_str, "%dx%d!", scale_wid, scale_hei);
+		_image->scale(scale_str);
+	}
 
 	// convert term hex colors to Magick::Color objects if needed
 	for (int x = 0; x < 26; ++x) {
@@ -181,7 +186,10 @@ void im2a::Asciifier::asciify() {
 	const char *charset = _options->charset();
 	size_t charset_len = strlen(charset);
 
-	// go print
+	// print header
+	print_header();
+
+	// print image
 	for (ssize_t row = 0; row < _image->rows(); ++row) {
 		for (ssize_t column = 0; column < _image->columns(); ++column) {
 			// calculate offset
@@ -190,13 +198,75 @@ void im2a::Asciifier::asciify() {
 			int char_index = buffer[offset * 2];
 			int color_index = buffer[offset * 2 + 1];
 
-			std::cout << "\x1b[38;5;" << color_index << "m" << charset[char_index % charset_len];
+			print_char(charset[char_index % charset_len], color_index);
+
 		}
 
 		// clear colors and feed line
-		std::cout << "\x1b[0;0m" << std::endl;
+		feed_line();
 	}
+
+	// print footer
+	print_footer();
 
 	// free the buffer
 	free(buffer);
+}
+
+void im2a::Asciifier::print_header() {
+	if (_options->html()) {
+		std::cout << "<!DOCTYPE html>" << std::endl;
+		std::cout << "<html>" << std::endl;
+		std::cout << std::endl;
+		std::cout << "<head>" << std::endl;
+		std::cout << "  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />" << std::endl;
+		std::cout << "  <title>im2a asciified image</title>" << std::endl;
+		std::cout << "</head>" << std::endl;
+		std::cout << std::endl;
+		std::cout << "<body>" << std::endl;
+		std::cout << std::endl;
+		std::cout << "<style type=\"text/css\">" << std::endl;
+		std::cout << "body { background: #000000; }" << std::endl;
+		std::cout << "pre { font: normal 12px/9px Menlo, monospace; }" << std::endl;
+		if (_options->grayscale()) {
+			for (int x = 0; x < 26; ++x) {
+				std::cout << ".c_" << std::dec << x << " { color: #" << std::hex << std::setw(6) << std::setfill('0') << TERM_COLORS_HEX_GS[x] << "; }" << std::endl;
+			}
+		} else {
+			for (int x = 0; x < 256; ++x) {
+				std::cout << ".c_" << std::dec << x << " { color: #" << std::hex << std::setw(6) << std::setfill('0') << TERM_COLORS_HEX_256[x] << "; }" << std::endl;
+			}
+		}
+		std::cout << "</style>" << std::endl;
+		std::cout << std::endl;
+		std::cout << "<pre>" << std::endl;
+	}
+}
+
+void im2a::Asciifier::print_footer() {
+	if (_options->html()) {
+		std::cout << "</pre>" << std::endl;
+		std::cout << std::endl;
+		std::cout << "</body>" << std::endl;
+		std::cout << "</html>" << std::endl;
+	}
+}
+
+void im2a::Asciifier::print_char(char c, int color_index) {
+	if (_options->html()) {
+		if (_options->grayscale()) {
+			color_index = color_index == 0 ? 0 : color_index == 16 ? 1 : color_index - 230;
+		}
+		std::cout << "<span class=\"c_" << std::dec << color_index  << "\">" << c << "</span>";
+	} else {
+		std::cout << "\x1b[38;5;" << color_index << "m" << c;
+	}
+}
+
+void im2a::Asciifier::feed_line() {
+	if (_options->html()) {
+		std::cout << std::endl;
+	} else {
+		std::cout << "\x1b[0;0m" << std::endl;
+	}
 }

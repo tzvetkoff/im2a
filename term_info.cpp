@@ -22,6 +22,7 @@
 #undef lines
 #endif
 
+#include "version.h"
 #include "term_info.h"
 
 im2a::TermInfo::TermInfo() {

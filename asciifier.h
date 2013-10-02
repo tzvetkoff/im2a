@@ -9,8 +9,8 @@
 
 /* asciifier.h */
 
-#ifndef __im2a__colorizer__
-#define __im2a__colorizer__
+#ifndef __im2a__asciifier__
+#define __im2a__asciifier__
 
 #include <Magick++.h>
 
@@ -26,6 +26,11 @@ namespace im2a {
 		TermInfo *_term_info;
 		Magick::Image *_image;
 
+		void print_header();
+		void print_footer();
+		void print_char(char c, int color_index);
+		void feed_line();
+
 	public:
 		Asciifier(Options *options, TermInfo *term_info, Magick::Image *image);
 		void asciify();
@@ -34,4 +39,4 @@ namespace im2a {
 
 }
 
-#endif /* defined(__im2a__colorizer__) */
+#endif /* defined(__im2a__asciifier__) */

@@ -13,6 +13,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "version.h"
 #include "options.h"
 
 im2a::Options::Options(int argc, const char **argv) {
@@ -43,6 +44,13 @@ im2a::Options::Options(int argc, const char **argv) {
 			if (strcmp(argument, "--help") == 0) {
 				help();
 				exit(0);
+			}
+
+			if (strcmp(argument, "--html") == 0) {
+				_html = true;
+
+				++i;
+				continue;
 			}
 
 			if (strcmp(argument, "--invert") == 0) {
@@ -156,7 +164,7 @@ im2a::Options::~Options() {
 }
 
 void im2a::Options::help() {
-	std::cerr << "im2a 0.1.1" << std::endl;
+	std::cerr << "im2a " VERSION << std::endl;
 	std::cerr << "Convert image files to ASCII art" << std::endl;
 	std::cerr << "Copyright (C) 2013 Latchezar Tzvetkoff" << std::endl;
 	std::cerr << "Distributed under the beerware license" << std::endl;
@@ -165,6 +173,7 @@ void im2a::Options::help() {
 	std::cerr << std::endl;
 	std::cerr << "OPTIONS" << std::endl;
 	std::cerr << "  --help                  Prints this message" << std::endl;
+	std::cerr << "  --html                  Output HTML" << std::endl;
 	std::cerr << "  --invert                Invert the image" << std::endl;
 	std::cerr << "  --width=N               Set output width" << std::endl;
 	std::cerr << "  --height=M              Set output height" << std::endl;
@@ -176,6 +185,10 @@ void im2a::Options::help() {
 	std::cerr << std::endl;
 	std::cerr << "Project homepage: https://github.com/tzvetkoff/im2a" << std::endl;
 	std::cerr << "Report bugs to https://github.com/tzvetkoff/im2a/issues" << std::endl;
+}
+
+bool im2a::Options::html() const {
+	return _html;
 }
 
 bool im2a::Options::invert() const {

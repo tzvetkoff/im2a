@@ -12,6 +12,7 @@
 #include <iostream>
 #include <Magick++.h>
 
+#include "version.h"
 #include "options.h"
 #include "term_info.h"
 #include "asciifier.h"
