@@ -18,6 +18,7 @@
 
 im2a::Options::Options(int argc, const char **argv) {
 	// set default options
+	_html = false;
 	_invert = false;
 	_width = 0;
 	_height = 0;
