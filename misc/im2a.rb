@@ -8,6 +8,7 @@ class Im2a < Formula
   depends_on 'imagemagick'
 
   def install
+    ENV.prepend_path 'PATH', '/usr/local/bin'
     system 'make'
     bin.install ['im2a']
   end
