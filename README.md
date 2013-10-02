@@ -21,13 +21,19 @@ brew install https://raw.github.com/tzvetkoff/im2a/master/misc/im2a.rb
 
 Depending on your distro, you'll have to install ImageMagick on your own.
 
-For ArchLinux, just type:
+For ArchLinux just type:
 
 ``` bash
 sudo pacman -S imagemagick
 ```
 
-After you've installed ImageMagick (and the development libraries, if your distro has split the package), get the sources and compile them:
+For Ubuntu:
+
+``` bash
+sudo apt-get install build-essential imagemagick libmagick++-dev
+```
+
+After you've installed ImageMagick and the development libraries, get the sources and compile them:
 
 ``` bash
 git clone git://github.com/tzvetkoff/im2a.git
