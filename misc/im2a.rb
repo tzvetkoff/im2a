@@ -5,6 +5,7 @@ class Im2a < Formula
   url 'git://github.com/tzvetkoff/im2a.git'
   version '0.1.2'
 
+  depends_on 'pkg-config'
   depends_on 'imagemagick'
 
   def install
