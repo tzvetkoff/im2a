@@ -17,25 +17,27 @@
 #include "options.h"
 #include "term_info.h"
 
-namespace im2a {
+namespace im2a
+{
 
-	class Asciifier {
+    class Asciifier
+    {
 
-	private:
-		Options *_options;
-		TermInfo *_term_info;
-		Magick::Image *_image;
+    private:
+        Options *_options;
+        TermInfo *_term_info;
+        Magick::Image *_image;
 
-		void print_header();
-		void print_footer();
-		void print_char(char c, int color_index);
-		void feed_line();
+        void print_header();
+        void print_footer();
+        void print_char(char, int);
+        void feed_line();
 
-	public:
-		Asciifier(Options *options, TermInfo *term_info, Magick::Image *image);
-		void asciify();
+    public:
+        Asciifier(Options *, TermInfo *, Magick::Image *);
+        void asciify();
 
-	};
+    };
 
 }
 

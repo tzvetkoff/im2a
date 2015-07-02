@@ -7,11 +7,29 @@
  * ----------------------------------------------------------------------------
  */
 
-/* version.h */
+/* term_info.h */
 
-#ifndef __im2a__version__
-#define __im2a__version__
+#ifndef __im2a__term_info__
+#define __im2a__term_info__
 
-#define VERSION "0.1.2"
+namespace im2a
+{
 
-#endif /* defined(__im2a__version__) */
+    class TermInfo
+    {
+
+    private:
+        int _columns;
+        int _lines;
+
+    public:
+        TermInfo();
+
+        int columns() const;
+        int lines() const;
+
+    };
+
+}
+
+#endif /* defined(__im2a__term_info__) */

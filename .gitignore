@@ -1,7 +1,36 @@
+# OSX
 .DS_Store
 ._.*
-im2a
+
+# Autotools, makefiles
+/aclocal.m4
+/m4/libtool.m4
+/m4/lt*.m4
+/autom4te.cache/
+/config/
+configure
+Makefile
+Makefile.in
+config.h
+config.h.in
+config.log
+config.status
+libtool
+stamp-h1
+
+# Binaries, libraries, objects, other
+/src/im2a
+.libs
+.deps
 *.o
+*.bak
+*~
+
+# Some images for testing
 *.png
 *.jpg
-nbproject
+*.gif
+
+# Just in case
+/tmp
+/build

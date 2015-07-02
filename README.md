@@ -9,40 +9,52 @@ The idea came after [jp2a](http://csl.sublevel3.org/jp2a/) for its lack of 256-c
 
 [ImageMagick](http://www.imagemagick.org/) - a great library for image manipulation. Chances are you already have it installed.
 
-## Installation on Mac OSX
+## Installation
+
+Just like any other program that uses Autotools:
+
+``` bash
+./bootstrap
+./configure
+make install
+```
+
+### MacOS X
 
 If you're using [Homebrew](http://brew.sh/) just type this in your terminal:
 
 ``` bash
-brew install https://raw.github.com/tzvetkoff/im2a/master/misc/im2a.rb
+brew install tzvetkoff/extras/im2a
 ```
 
-## Installation on other *nix platforms
+## Usage
 
-Depending on your distro, you'll have to install ImageMagick on your own.
-
-For ArchLinux just type:
-
-``` bash
-sudo pacman -S imagemagick
 ```
+im2a 0.2.0
 
-For Ubuntu:
+Convert image files to ASCII art
+Copyright (C) 2013 Latchezar Tzvetkoff
+Distributed under The Beerware License
 
-``` bash
-sudo apt-get install build-essential imagemagick libmagick++-dev
+Usage:
+  ./build/bin/im2a [options] <file>
+
+Options:
+  -h, --help                  Prints this message
+  -v, --version               Prints version string
+  -m, --html                  Output HTML
+  -i, --invert                Invert the image
+  -W, --width=N               Set output width
+  -H, --height=M              Set output height
+  -c, --charset=CHARSET       Set output charset
+  -g, --grayscale             Grayscale output instead of 256-color
+  -R, --red-weight=RW         Set red component weight (default: 0.2989)
+  -G, --green-weight=GW       Set green component weight (default: 0.5866)
+  -B, --blue-weight=BW        Set blue component weight (default: 0.1145)
+
+Project homepage: https://github.com/tzvetkoff/im2a
+Report bugs to https://github.com/tzvetkoff/im2a/issues
 ```
-
-After you've installed ImageMagick and the development libraries, get the sources and compile them:
-
-``` bash
-git clone git://github.com/tzvetkoff/im2a.git
-cd im2a
-make
-sudo cp im2a /usr/local/bin
-```
-
-That's it.
 
 ## License
 
