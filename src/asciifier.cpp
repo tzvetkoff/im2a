@@ -262,13 +262,16 @@ void im2a::Asciifier::asciify()
     const char *charset = _options->charset();
     size_t charset_len = strlen(charset);
 
-    // print header
+    /* print header */
     print_header();
 
-    // print image
+    /* print image */
     for (ssize_t row = 0; row < _image->rows(); ++row) {
+        /* put some leading spaces if needed */
+        begin_line();
+
         for (ssize_t column = 0; column < _image->columns(); ++column) {
-            // calculate offset
+            /* calculate offset */
             ssize_t offset = row * _image->columns() + column;
 
             int char_index = buffer[offset * 2];
@@ -278,14 +281,14 @@ void im2a::Asciifier::asciify()
 
         }
 
-        // clear colors and feed line
+        /* clear colors and feed line */
         feed_line();
     }
 
-    // print footer
+    /* print footer */
     print_footer();
 
-    // free the buffer
+    /* free the buffer */
     free(buffer);
 }
 
@@ -307,6 +310,9 @@ void im2a::Asciifier::print_header()
         std::cout << "body { background: #000000; }" << std::endl;
         std::cout << "pre { font: normal 12px/9px Menlo, monospace; }" <<
             std::endl;
+        if (_options->center()) {
+            std::cout << "pre { text-aling: center; }" << std::endl;
+        }
         if (_options->grayscale()) {
             for (int x = 0; x < 26; ++x) {
                 std::cout << ".c_" << std::dec << x << " { color: #" <<
@@ -347,6 +353,14 @@ void im2a::Asciifier::print_char(char c, int color_index)
             c << "</span>";
     } else {
         std::cout << "\x1b[38;5;" << color_index << "m" << c;
+    }
+}
+
+void im2a::Asciifier::begin_line()
+{
+    if (_options->center() && !_options->html()) {
+        std::cout <<
+            std::setw((_term_info->columns() - _image->columns()) / 2) << " ";
     }
 }
 

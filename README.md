@@ -30,7 +30,7 @@ brew install tzvetkoff/extras/im2a
 ## Usage
 
 ```
-im2a 0.2.0
+im2a 0.3.0
 
 Convert image files to ASCII art
 Copyright (C) 2013 Latchezar Tzvetkoff
@@ -44,6 +44,7 @@ Options:
   -v, --version               Prints version string
   -m, --html                  Output HTML
   -i, --invert                Invert the image
+  -t, --center                Center the image
   -W, --width=N               Set output width
   -H, --height=M              Set output height
   -c, --charset=CHARSET       Set output charset

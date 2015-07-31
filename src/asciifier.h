@@ -31,6 +31,7 @@ namespace im2a
         void print_header();
         void print_footer();
         void print_char(char, int);
+        void begin_line();
         void feed_line();
 
     public:

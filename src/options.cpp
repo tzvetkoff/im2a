@@ -25,6 +25,7 @@ im2a::Options::Options(int argc, char *const *argv)
     /* defaults */
     _html = false;
     _invert = false;
+    _center = false;
     _width = 0;
     _height = 0;
     _charset = NULL;
@@ -40,6 +41,7 @@ im2a::Options::Options(int argc, char *const *argv)
         {"version", no_argument, NULL, 'v'},
         {"html", no_argument, NULL, 'm'},
         {"invert", no_argument, NULL, 'i'},
+        {"center", no_argument, NULL, 't'},
         {"width", required_argument, NULL, 'W'},
         {"height", required_argument, NULL, 'H'},
         {"charset", required_argument, NULL, 'c'},
@@ -51,7 +53,7 @@ im2a::Options::Options(int argc, char *const *argv)
     };
 
     /* parse comment line options */
-    while ((ch = getopt_long(argc, argv, "hvmiW:H:c:gR:G:B:", longopts,
+    while ((ch = getopt_long(argc, argv, "hvmitW:H:c:gR:G:B:", longopts,
         NULL)) != -1) {
         switch (ch) {
             case 'h':
@@ -68,6 +70,10 @@ im2a::Options::Options(int argc, char *const *argv)
 
             case 'i':
                 _invert = true;
+                break;
+
+            case 't':
+                _center = true;
                 break;
 
             case 'W':
@@ -155,6 +161,7 @@ void im2a::Options::usage(std::ostream &out, int exit_code)
     out << "  -v, --version               Prints version string" << std::endl;
     out << "  -m, --html                  Output HTML" << std::endl;
     out << "  -i, --invert                Invert the image" << std::endl;
+    out << "  -t, --center                Center the image" << std::endl;
     out << "  -W, --width=N               Set output width" << std::endl;
     out << "  -H, --height=M              Set output height" << std::endl;
     out << "  -c, --charset=CHARSET       Set output charset" << std::endl;
@@ -181,6 +188,11 @@ bool im2a::Options::html() const
 bool im2a::Options::invert() const
 {
     return _invert;
+}
+
+bool im2a::Options::center() const
+{
+    return _center;
 }
 
 int im2a::Options::width() const
