@@ -2,7 +2,7 @@
 
 # Define the package version numbers, bug reporting link, project homepage.
 m4_define([IM2A_VERSION_MAJOR_], [0])
-m4_define([IM2A_VERSION_MINOR_], [3])
+m4_define([IM2A_VERSION_MINOR_], [4])
 m4_define([IM2A_VERSION_PATCH_], [0])
 m4_define([IM2A_VERSION_STRING_], [IM2A_VERSION_MAJOR_.IM2A_VERSION_MINOR_.IM2A_VERSION_PATCH_])
 m4_define([IM2A_BUGREPORT_URL_], [https://github.com/tzvetkoff/im2a/issues])
@@ -40,7 +40,7 @@ AC_CHECK_LIB([ncurses], [tgetnum],, [
   AC_MSG_ERROR([tgetnum() not found in -lncurses.])
 ])
 
-# Check for ImageMagick C++ bindings
+# Check for ImageMagick C++ bindings.
 AC_CHECK_IMAGEMAGICK()
 
 if test x"$ac_imagemagick" != "xyes"; then

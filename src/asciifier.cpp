@@ -170,8 +170,13 @@ void im2a::Asciifier::asciify()
         _image->rows() * 2);
 
     /* pixel packet */
+#if MagickLibVersion >= 0x700
+    Magick::Quantum *pixels = _image->getPixels(0, 0, _image->columns(),
+        _image->rows());
+#else
     Magick::PixelPacket *pixels = _image->getPixels(0, 0, _image->columns(),
         _image->rows());
+#endif
 
     /* red, green and blue weights as came from options */
     double red_weight = _options->red_weight(),
@@ -187,13 +192,20 @@ void im2a::Asciifier::asciify()
             /* calculate pixel offset */
             ssize_t offset = row * _image->columns() + column;
 
-            /* get pixel */
-            Magick::PixelPacket *pixel = pixels + offset;
-
             /* get pixel's grayscale values */
+#if MagickLibVersion >= 0x700
+            Magick::Quantum *pixel = pixels +
+                offset * MagickCore::GetPixelChannels(_image->image());
+            Magick::Quantum gs = red_weight * (double)(pixel[0])
+                               + green_weight * (double)(pixel[1])
+                               + blue_weight * (double)(pixel[2]);
+#else
+            Magick::PixelPacket *pixel = pixels + offset;
             Magick::Quantum gs = red_weight * pixel->red
                                + green_weight * pixel->green
                                + blue_weight * pixel->blue;
+
+#endif
 
             /* start with an impossibly long distance */
             double min = 0xFFFFFFFF;
@@ -207,11 +219,19 @@ void im2a::Asciifier::asciify()
                 Magick::Color *color = &TERM_COLORS_GS[index];
 
                 /* calculate distance */
+#if MagickLibVersion >= 0x700
+                double distance = sqrt(
+                    pow(color->quantumRed() - gs, 2) +
+                    pow(color->quantumGreen() - gs, 2) +
+                    pow(color->quantumBlue() - gs, 2)
+                );
+#else
                 double distance = sqrt(
                     pow(color->redQuantum() - gs, 2) +
                     pow(color->greenQuantum() - gs, 2) +
                     pow(color->blueQuantum() - gs, 2)
                 );
+#endif
 
                 if (distance < min) {
                     min = distance;
@@ -238,12 +258,20 @@ void im2a::Asciifier::asciify()
                     /* get the color itself */
                     Magick::Color *color = &TERM_COLORS_256[index];
 
+#if MagickLibVersion >= 0x700
+                    double distance = sqrt(
+                        pow(color->quantumRed() - pixel[0], 2) +
+                        pow(color->quantumGreen() - pixel[1], 2) +
+                        pow(color->quantumBlue() - pixel[2], 2)
+                    );
+#else
                     /* calculate distance */
                     double distance = sqrt(
                         pow(color->redQuantum() - pixel->red, 2) +
                         pow(color->greenQuantum() - pixel->green, 2) +
                         pow(color->blueQuantum() - pixel->blue, 2)
                     );
+#endif
 
                     if (distance < min) {
                         min = distance;
