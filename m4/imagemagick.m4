@@ -20,11 +20,8 @@ AC_DEFUN([AC_CHECK_IMAGEMAGICK], [
   IMAGEMAGICK_LDFLAGS=""
   IMAGEMAGICK_CXXFLAGS=""
 
-  AC_ARG_WITH([imagemagick-config], AC_HELP_STRING([--with-imagemagick-config], [Provide path to Magick++-config.]), [
+  AC_ARG_WITH([magick++-config], AC_HELP_STRING([--with-magick++-config=path], [Provide path to Magick++-config.]), [
     ac_imagemagick="${withval}"
-    if test "x${withval}" != "xno" -a "x${withval}" != "xyes"; then
-      ac_imagemagick="yes"
-    fi
   ], [
     ac_imagemagick="auto"
   ])
@@ -36,7 +33,7 @@ AC_DEFUN([AC_CHECK_IMAGEMAGICK], [
     imagemagick_config_dirs="/usr/bin /usr/local/bin /usr/local/imagemagick/bin /opt/imagemagick/bin"
     AC_FIND_FILE(Magick++-config, ${imagemagick_config_dirs}, ac_imagemagick_config_dir)
 
-    if test "${ac_imagemagick_config_dir}" = "no"; then
+    if test "x${ac_imagemagick_config_dir}" = "xno"; then
       ac_imagemagick="no"
     else
       IMAGEMAGICK_LDFLAGS=`${ac_imagemagick_config_dir}/Magick++-config --ldflags 2>/dev/null`

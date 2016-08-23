@@ -30,14 +30,14 @@ brew install tzvetkoff/extras/im2a
 ## Usage
 
 ```
-im2a 0.3.0
+im2a 0.4.1
 
 Convert image files to ASCII art
 Copyright (C) 2013 Latchezar Tzvetkoff
 Distributed under The Beerware License
 
 Usage:
-  ./build/bin/im2a [options] <file>
+  im2a [options] <file>
 
 Options:
   -h, --help                  Prints this message
