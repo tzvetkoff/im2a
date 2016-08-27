@@ -35,7 +35,7 @@ im2a::Options::Options(int argc, char *const *argv)
     _blue_weight = 0.1145f;
     _source = NULL;
 
-    char ch;
+    int ch;
     const struct option longopts[] = {
         {"help", no_argument, NULL, 'h'},
         {"version", no_argument, NULL, 'v'},
