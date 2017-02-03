@@ -30,7 +30,7 @@ brew install tzvetkoff/extras/im2a
 ## Usage
 
 ```
-im2a 0.4.2
+im2a 0.4.3
 
 Convert image files to ASCII art
 Copyright (C) 2013 Latchezar Tzvetkoff

@@ -18,6 +18,11 @@ config.status
 libtool
 stamp-h1
 
+# RVM
+/.ruby-version
+/.ruby-gemset
+/.ruby-env
+
 # Binaries, libraries, objects, other
 /src/im2a
 .libs

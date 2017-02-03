@@ -12,7 +12,7 @@ AC_DEFUN([AC_FIND_FILE], [
   done
 ])
 
-AC_DEFUN([AC_CHECK_IMAGEMAGICK], [
+AC_DEFUN([AX_CHECK_IMAGEMAGICK], [
   # Local variables
   ac_imagemagick="no"
 

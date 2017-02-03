@@ -9,7 +9,9 @@
 
 /* asciifier.cpp */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #include <iostream>
 #include <iomanip>
@@ -109,35 +111,54 @@ im2a::Asciifier::Asciifier(Options *options, TermInfo *term_info,
     _term_info = term_info;
     _image = image;
 
-    /* only scale the image if it's a terminal or width and height
-       options are explicitly passed */
-    if (!_options->html() || (_options->width() > 0 &&
-        _options->height() > 0)) {
-        /* proportions to scale image to */
-        int scale_wid, scale_hei;
+    /* determine how should we scale the image */
+    int scale_width = 0, scale_height = 0;
 
-        if (_options->width() > 0 && _options->height() > 0) {
-            scale_wid = _options->width();
-            scale_hei = _options->height();
-        } else {
-            /* try to fit height*2 first */
-            double y_prop = (((double)_image->rows()) /
+    if (_options->width() > 0 && options->height() > 0) {
+        /* use provided values */
+        scale_width = options->width();
+        scale_height = options->height();
+    } else if (_options->width() > 0) {
+        /* guess height proportionally from width */
+        double prop = (double)_image->columns() / (double)_options->width();
+        scale_width = _options->width();
+        scale_height = round((double)_image->rows() / prop);
+
+        /* halven the height for terminal output */
+        if (!_options->html()) {
+            scale_height /= 2;
+        }
+    } else if (_options->height() > 0) {
+        /* guess width proportionally from height */
+        double prop = (double)_image->rows() / (double)_options->height();
+        scale_width = round((double)_image->columns() / prop);
+        scale_height = _options->height();
+
+        /* double the width for terminal output */
+        if (!_options->html()) {
+            scale_width *= 2;
+        }
+    } else if (!_options->html()) {
+        /* scale the image to terminal size */
+        double prop = (((double)_image->rows()) /
                 ((double)_term_info->lines() - 1)) / 2.0;
-            scale_wid = round(_image->columns() / y_prop);
-            scale_hei = _term_info->lines() - 1;
+        scale_width = round((double)_image->columns() / prop);
+        scale_height = _term_info->lines() - 1;
 
             /* fit width (and halven result height) */
-            if (scale_wid > _term_info->columns()) {
-                double x_prop = (((double)_image->columns()) /
+        if (scale_width > _term_info->columns()) {
+            prop = (((double)_image->columns()) /
                     ((double)_term_info->columns() - 1));
-                scale_wid = _term_info->columns() - 1;
-                scale_hei = round((_image->rows() / x_prop) / 2.0);
+            scale_width = _term_info->columns() - 1;
+            scale_height = round(((double)_image->rows() / prop) / 2.0);
             }
         }
 
-        /* scale the image */
-        char scale_str[32];
-        sprintf(scale_str, "%dx%d!", scale_wid, scale_hei);
+    /* scale it */
+    if (scale_width > 0 && scale_height > 0) {
+        char scale_str[0x40];
+        snprintf(scale_str, sizeof(scale_str), "%dx%d!",
+            scale_width, scale_height);
         _image->scale(scale_str);
     }
 

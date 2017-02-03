@@ -1,0 +1,61 @@
+.TH im2a 1 "February 2017" "0.4.3" "User Commands"
+.SH "NAME"
+\fBim2a\fR - convert image files to ASCII art.
+.SH "SYNOPSIS"
+.B im2a
+[options] \<file\>
+.SH "DESCRIPTION"
+.B im2a
+converts image files to ASCII art.
+.SH "OPTIONS"
+.TP
+\fB-h\fR, \fB--help\fR
+Print a short help message and exit.
+.TP
+\fB-v\fR, \fB--version\fR
+Print version information and exit.
+.TP
+\fB-m\fR, \fB--html\fR
+Output HTML code instead of xterm escape sequences.
+.TP
+\fB-i\fR, \fB--invert\fR
+Invert the image.
+.TP
+\fB-t\fR, \fB--center\fR
+Center the image.
+.TP
+\fB-W\fR \fIWIDTH\fR, \fB--width\fR=\fIWIDTH\fR
+Set output width to \fIWIDTH\fR.
+If you provide only \fB--width\fR, height will be calculated automatically from image size.
+If the output is not HTML, calculated height will be divided by 2 to compensate common terminal font sizes.
+.TP
+\fB-H\fR \fIHEIGHT\fR, \fB--height\fR=\fIHEIGHT\fR
+Set output height to \fIHEIGHT\fR.
+If you provide only \fB--height\fR, width will be calculated automatically from image size.
+IF the output is not HTML, calculated width will be multiplied by 2 to compensate common terminal font sizes.
+.TP
+\fB-c\fR \fICHARSET\fR, \fB--charset\fR=\fICHARSET\fR
+Set output charset to \fICHARSET\fR.
+Default: "\fBM   ...',;:clodxkO0KXNWMM\fR".
+.TP
+\fB-g\fR, \fB--grayscale\fR
+Grayscale output instead of 256-color.
+.TP
+\fB-R\fR \fIVALUE\fR, \fB--red-weight\fR=\fIVALUE\fR
+Set red component weight for grayscale conversion to \fIVALUE\fR. Default: \fB0.2989\fR.
+.TP
+\fB-G\fR \fIVALUE\fR, \fB--green-weight\fR=\fIVALUE\fR
+Set green component weight for grayscale conversion to \fIVALUE\fR. Default: \fB0.5866\fR.
+.TP
+\fB-B\fR \fIVALUE\fR, \fB--blue-weight\fR=\fIVALUE\fR
+Set blue component weight for grayscale conversion to \fIVALUE\fR. Default: \fB0.1145\fR.
+.SH "PROJECT HOMEPAGE"
+\fBim2a\fR is hosted and maintained at \fBhttps://github.com/tzvetkoff/im2a\fR.
+.SH "BUGS"
+If you encounter a bug, please report it to \fBhttps://github.com/tzvetkoff/im2a/issues\fR.
+.SH "SEE ALSO"
+.BR "https://github.com/cslarsen/jp2a" " - where it all started."
+.SH "AUTHORS"
+Latchezar Tzvetkoff \<latchezar@tzvetkoff.net\> -- http://tzvetkoff.net/
+.SH "LICENSE"
+\fBim2a\fR is distributed under The Beerware License.

@@ -9,7 +9,9 @@
 
 /* options.cpp */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #include <iostream>
 #include <string.h>
@@ -78,14 +80,33 @@ im2a::Options::Options(int argc, char *const *argv)
 
             case 'W':
                 _width = atoi(optarg);
+                if (_width <= 0) {
+                    std::cerr << _name
+                        << ": invalid width: " << _width << std::endl;
+                    std::cerr << std::endl;
+                    usage();
+                }
                 break;
 
             case 'H':
                 _height = atoi(optarg);
+                if (_height <= 0) {
+                    std::cerr << _name <<
+                        ": invalid height: " << _height << std::endl;
+                    std::cerr << std::endl;
+                    usage();
+                }
                 break;
 
             case 'c':
                 _charset = strdup(optarg);
+                if (strlen(_charset) < 2) {
+                    std::cerr << _name <<
+                        ": charset should be at least 2 symbols long" <<
+                        std::endl;
+                    std::cerr << std::endl;
+                    usage();
+                }
                 break;
 
             case 'g':
@@ -110,25 +131,18 @@ im2a::Options::Options(int argc, char *const *argv)
         }
     }
 
-    /* check width & height */
-    if (_width < 0 || _height < 0) {
-        std::cerr << _name << ": invalid width/height" << std::endl;
-        std::cerr << std::endl;
-        usage();
-    }
-
-    /* check charset */
+    /* if no charset provided, use default */
     if (!_charset) {
         _charset = strdup(" M   ...',;:clodxkO0KXNWMM");
-    } else if (strlen(_charset) < 2) {
-        std::cerr << _name << ": charset should be at least 2 symbols long" <<
-            std::endl;
-        std::cerr << std::endl;
-        usage();
     }
 
     /* check for 1 positional argument */
     if (argc - optind != 1) {
+        std::cerr << _name <<
+            ": wrong number of arguments " <<
+            "(given " << argc - 1 << ", expected " << 1 << ")" <<
+            std::endl;
+        std::cerr << std::endl;
         usage();
     }
 
