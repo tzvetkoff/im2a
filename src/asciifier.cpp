@@ -125,7 +125,7 @@ im2a::Asciifier::Asciifier(Options *options, TermInfo *term_info,
         scale_height = round((double)_image->rows() / prop);
 
         /* halven the height for terminal output */
-        if (!_options->html()) {
+        if (!_options->html() && !_options->pixel()) {
             scale_height /= 2;
         }
     } else if (_options->height() > 0) {
@@ -135,24 +135,40 @@ im2a::Asciifier::Asciifier(Options *options, TermInfo *term_info,
         scale_height = _options->height();
 
         /* double the width for terminal output */
-        if (!_options->html()) {
+        if (!_options->html() && !_options->pixel()) {
             scale_width *= 2;
         }
     } else if (!_options->html()) {
-        /* scale the image to terminal size */
-        double prop = (((double)_image->rows()) /
-                ((double)_term_info->lines() - 1)) / 2.0;
-        scale_width = round((double)_image->columns() / prop);
-        scale_height = _term_info->lines() - 1;
+        if (_options->pixel()) {
+            /* scale the image to terminal size */
+            double prop = (((double)_image->rows()) /
+                ((double)(_term_info->lines() * 2 - 2)));
+            scale_width = round((double)_image->columns() / prop);
+            scale_height = _term_info->lines() * 2 - 2;
+
+            /* fit width */
+            if (scale_width > _term_info->columns()) {
+                prop = (((double)_image->columns()) /
+                    ((double)_term_info->columns() - 1));
+                scale_width = _term_info->columns() - 1;
+                scale_height = round((double)_image->rows() / prop);
+            }
+        } else {
+            /* scale the image to terminal size */
+            double prop = (((double)_image->rows()) /
+                    ((double)_term_info->lines() - 1)) / 2.0;
+            scale_width = round((double)_image->columns() / prop);
+            scale_height = _term_info->lines() - 1;
 
             /* fit width (and halven result height) */
-        if (scale_width > _term_info->columns()) {
-            prop = (((double)_image->columns()) /
-                    ((double)_term_info->columns() - 1));
-            scale_width = _term_info->columns() - 1;
-            scale_height = round(((double)_image->rows() / prop) / 2.0);
+            if (scale_width > _term_info->columns()) {
+                prop = (((double)_image->columns()) /
+                        ((double)_term_info->columns() - 1));
+                scale_width = _term_info->columns() - 1;
+                scale_height = round(((double)_image->rows() / prop) / 2.0);
             }
         }
+    }
 
     /* scale it */
     if (scale_width > 0 && scale_height > 0) {
@@ -323,15 +339,27 @@ void im2a::Asciifier::asciify()
             /* calculate offset */
             ssize_t offset = row * _image->columns() + column;
 
-            int char_index = buffer[offset * 2];
-            int color_index = buffer[offset * 2 + 1];
-
-            print_char(charset[char_index % charset_len], color_index);
-
+            if (_options->pixel()) {
+                /* pixel mode - use box-drawing characters */
+                size_t offset2 = (row + 1) * _image->columns() + column;
+                int color_index = buffer[offset * 2 + 1];
+                int color_index2 = buffer[offset2 * 2 + 1];
+                print_pixel(color_index, color_index2);
+            } else {
+                /* normal mode - use the charset */
+                int char_index = buffer[offset * 2];
+                int color_index = buffer[offset * 2 + 1];
+                print_char(charset[char_index % charset_len], color_index);
+            }
         }
 
         /* clear colors and feed line */
         feed_line();
+
+        /* in pixel mode we draw 2 rows at the same time */
+        if (_options->pixel()) {
+            ++row;
+        }
     }
 
     /* print footer */
@@ -403,6 +431,11 @@ void im2a::Asciifier::print_char(char c, int color_index)
     } else {
         std::cout << "\x1b[38;5;" << color_index << "m" << c;
     }
+}
+
+void im2a::Asciifier::print_pixel(int color_index1, int color_index2) {
+    std::cout << "\x1b[48;5;" << color_index1 << "m" <<
+        "\x1b[38;5;" << color_index2 << "m" << "▄";
 }
 
 void im2a::Asciifier::begin_line()

@@ -28,6 +28,7 @@ im2a::Options::Options(int argc, char *const *argv)
     _html = false;
     _invert = false;
     _center = false;
+    _pixel = false;
     _width = 0;
     _height = 0;
     _charset = NULL;
@@ -44,6 +45,7 @@ im2a::Options::Options(int argc, char *const *argv)
         {"html", no_argument, NULL, 'm'},
         {"invert", no_argument, NULL, 'i'},
         {"center", no_argument, NULL, 't'},
+        {"pixel", no_argument, NULL, 'p'},
         {"width", required_argument, NULL, 'W'},
         {"height", required_argument, NULL, 'H'},
         {"charset", required_argument, NULL, 'c'},
@@ -55,7 +57,7 @@ im2a::Options::Options(int argc, char *const *argv)
     };
 
     /* parse comment line options */
-    while ((ch = getopt_long(argc, argv, "hvmitW:H:c:gR:G:B:", longopts,
+    while ((ch = getopt_long(argc, argv, "hvmitpW:H:c:gR:G:B:", longopts,
         NULL)) != -1) {
         switch (ch) {
             case 'h':
@@ -76,6 +78,10 @@ im2a::Options::Options(int argc, char *const *argv)
 
             case 't':
                 _center = true;
+                break;
+
+            case 'p':
+                _pixel = true;
                 break;
 
             case 'W':
@@ -131,6 +137,14 @@ im2a::Options::Options(int argc, char *const *argv)
         }
     }
 
+    /* check for options compatibility */
+    if (_html && _pixel) {
+        std::cerr << _name <<
+            ": cannot use --html and --pixel at the same time" << std::endl;
+        std::cerr << std::endl;
+        usage();
+    }
+
     /* if no charset provided, use default */
     if (!_charset) {
         _charset = strdup(" M   ...',;:clodxkO0KXNWMM");
@@ -176,6 +190,7 @@ void im2a::Options::usage(std::ostream &out, int exit_code)
     out << "  -m, --html                  Output HTML" << std::endl;
     out << "  -i, --invert                Invert the image" << std::endl;
     out << "  -t, --center                Center the image" << std::endl;
+    out << "  -p, --pixel                 Pixel mode" << std::endl;
     out << "  -W, --width=N               Set output width" << std::endl;
     out << "  -H, --height=M              Set output height" << std::endl;
     out << "  -c, --charset=CHARSET       Set output charset" << std::endl;
@@ -207,6 +222,10 @@ bool im2a::Options::invert() const
 bool im2a::Options::center() const
 {
     return _center;
+}
+
+bool im2a::Options::pixel() const {
+    return _pixel;
 }
 
 int im2a::Options::width() const

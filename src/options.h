@@ -24,6 +24,7 @@ namespace im2a
         bool _html;
         bool _invert;
         bool _center;
+        bool _pixel;
         int _width;
         int _height;
         char *_charset;
@@ -42,6 +43,7 @@ namespace im2a
         bool html() const;
         bool invert() const;
         bool center() const;
+        bool pixel() const;
         int width() const;
         int height() const;
         char *charset() const;

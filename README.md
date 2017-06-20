@@ -3,6 +3,12 @@
 
 An image to ASCII converter, made for 256-color terminals.
 
+Here are some examples:
+
+| Source                      | Default                      | Grayscale                    | Pixel                        | Grayscale + Pixel            |
+| --------------------------- | ---------------------------- | ---------------------------- | ---------------------------- | ---------------------------- |
+| ![Source](examples/oc0.png) | ![Default](examples/oc1.png) | ![Default](examples/oc2.png) | ![Default](examples/oc3.png) | ![Default](examples/oc4.png) |
+
 The idea came after [jp2a](http://csl.sublevel3.org/jp2a/) for its lack of 256-color terminal support and its JPEG format restriction.
 
 ## Dependencies
@@ -30,14 +36,14 @@ brew install tzvetkoff/extras/im2a
 ## Usage
 
 ```
-im2a 0.4.3
+im2a 0.5.0
 
 Convert image files to ASCII art
 Copyright (C) 2013 Latchezar Tzvetkoff
 Distributed under The Beerware License
 
 Usage:
-  im2a [options] <file>
+  ./src/im2a [options] <file>
 
 Options:
   -h, --help                  Prints this message
@@ -45,6 +51,7 @@ Options:
   -m, --html                  Output HTML
   -i, --invert                Invert the image
   -t, --center                Center the image
+  -p, --pixel                 Pixel mode
   -W, --width=N               Set output width
   -H, --height=M              Set output height
   -c, --charset=CHARSET       Set output charset
