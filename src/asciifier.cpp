@@ -171,7 +171,8 @@ im2a::Asciifier::Asciifier(Options *options, TermInfo *term_info,
     }
 
     /* scale it */
-    if (scale_width > 0 && scale_height > 0) {
+    if (scale_width > 0 && scale_height > 0 &&
+        (scale_width != _image->columns() || scale_height != _image->rows())) {
         char scale_str[0x40];
         snprintf(scale_str, sizeof(scale_str), "%dx%d!",
             scale_width, scale_height);
@@ -424,7 +425,7 @@ void im2a::Asciifier::print_char(char c, int color_index)
     if (_options->html()) {
         if (_options->grayscale()) {
             color_index = color_index == 0 ? 0 :
-                color_index == 16 ? 1 : color_index - 230;
+                color_index == 15 ? 1 : color_index - 230;
         }
         std::cout << "<span class=\"c_" << std::dec << color_index << "\">" <<
             c << "</span>";
