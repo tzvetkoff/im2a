@@ -43,7 +43,7 @@ AC_CHECK_LIB([ncurses], [tgetnum],, [
 AX_CHECK_IMAGEMAGICK()
 
 if test x"$ac_imagemagick" != "xyes"; then
-  AC_MSG_ERROR([ImageMagick C++ bindings not found. Please install ImageMagick with C++ bindings or use --with-imagemagick-config=path.])
+  AC_MSG_ERROR([ImageMagick C++ bindings not found. Please install ImageMagick with C++ bindings or use --with-magick++-config=path.])
 fi
 
 AC_SUBST([IMAGEMAGICK_CXXFLAGS])
