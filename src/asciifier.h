@@ -31,7 +31,7 @@ namespace im2a
         void print_header();
         void print_footer();
         void print_char(char, int);
-        void print_pixel(int, int);
+        void print_pixel(int color_index1, int color_index2, int prev_color1 = -1, int prev_color2 = -1);
         void begin_line();
         void feed_line();
 

@@ -335,6 +335,8 @@ void im2a::Asciifier::asciify()
     for (ssize_t row = 0; row < _image->rows(); ++row) {
         /* put some leading spaces if needed */
         begin_line();
+        int prev_color = -1;
+        int prev_color2 = -1;
 
         for (ssize_t column = 0; column < _image->columns(); ++column) {
             /* calculate offset */
@@ -345,7 +347,9 @@ void im2a::Asciifier::asciify()
                 size_t offset2 = (row + 1) * _image->columns() + column;
                 int color_index = buffer[offset * 2 + 1];
                 int color_index2 = buffer[offset2 * 2 + 1];
-                print_pixel(color_index, color_index2);
+                print_pixel(color_index, color_index2, prev_color, prev_color2);
+                prev_color = color_index;
+                prev_color2 = color_index2;
             } else {
                 /* normal mode - use the charset */
                 int char_index = buffer[offset * 2];
@@ -434,9 +438,14 @@ void im2a::Asciifier::print_char(char c, int color_index)
     }
 }
 
-void im2a::Asciifier::print_pixel(int color_index1, int color_index2) {
-    std::cout << "\x1b[48;5;" << color_index1 << "m" <<
-        "\x1b[38;5;" << color_index2 << "m" << "▄";
+void im2a::Asciifier::print_pixel(int color_index1, int color_index2, int prev_color1, int prev_color2) {
+    if (color_index1 != prev_color1) {
+        std::cout << "\x1b[48;5;" << color_index1 << "m";
+    }
+    if (color_index2 != prev_color2) {
+        std::cout << "\x1b[38;5;" << color_index2 << "m";
+    }
+    std::cout << "▄";
 }
 
 void im2a::Asciifier::begin_line()
