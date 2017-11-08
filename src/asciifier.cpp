@@ -445,7 +445,11 @@ void im2a::Asciifier::print_pixel(int color_index1, int color_index2, int prev_c
     if (color_index2 != prev_color2) {
         std::cout << "\x1b[38;5;" << color_index2 << "m";
     }
-    std::cout << "▄";
+    if (color_index1 == color_index2) {
+        std::cout <<  " ";
+    } else {
+        std::cout << "▄";
+    }
 }
 
 void im2a::Asciifier::begin_line()
