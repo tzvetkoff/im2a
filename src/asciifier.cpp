@@ -208,9 +208,9 @@ void im2a::Asciifier::asciify()
         _image->negate();
     }
 
-    /* allocate a buffer for color index and output char */
+    /* allocate a buffer for color index, output char and special attributes */
     unsigned char *buffer = (unsigned char *)malloc(_image->columns() *
-        _image->rows() * 2);
+        _image->rows() * 3);
 
     /* pixel packet */
 #if MagickLibVersion >= 0x700
@@ -235,19 +235,29 @@ void im2a::Asciifier::asciify()
             /* calculate pixel offset */
             ssize_t offset = row * _image->columns() + column;
 
-            /* get pixel's grayscale values */
+            /* get pixel's grayscale and transparency values */
+            bool transparent = false;
 #if MagickLibVersion >= 0x700
             Magick::Quantum *pixel = pixels +
                 offset * MagickCore::GetPixelChannels(_image->image());
             Magick::Quantum gs = red_weight * (double)(pixel[0])
                                + green_weight * (double)(pixel[1])
                                + blue_weight * (double)(pixel[2]);
+            if (_image->matte()) {
+                if (pixel[3] >= 0xff) {
+                    transparent = true;
+                }
+            }
 #else
             Magick::PixelPacket *pixel = pixels + offset;
             Magick::Quantum gs = red_weight * pixel->red
                                + green_weight * pixel->green
                                + blue_weight * pixel->blue;
-
+            if (_image->matte()) {
+                if (pixel->opacity >= 0xff) {
+                    transparent = true;
+                }
+            }
 #endif
 
             /* start with an impossibly long distance */
@@ -284,14 +294,18 @@ void im2a::Asciifier::asciify()
 
             /* store the char index */
             unsigned char char_index = idx;
-            buffer[offset * 2] = char_index;
+            buffer[offset * 3] = char_index;
+
+            /* store special flags */
+            buffer[offset * 3 + 2] = 0;
+            buffer[offset * 3 + 2] |= transparent ? 0x01 : 0;
 
             /* if grayscale, store the resulted color index too, otherwise
                go and calculate it from the 256 colors */
             if (grayscale) {
                 unsigned char color_index =
                     (idx == 0 ? 0 : idx == 1 ? 15 : idx + 230) & 0xFF;
-                buffer[offset * 2 + 1] = color_index;
+                buffer[offset * 3 + 1] = color_index;
             } else {
                 /* start with an impossibly long distance again */
                 min = 0xFFFFFFFF;
@@ -324,7 +338,7 @@ void im2a::Asciifier::asciify()
 
                 /* store the color index */
                 unsigned char color_index = idx & 0xFF;
-                buffer[offset * 2 + 1] = color_index;
+                buffer[offset * 3 + 1] = color_index;
             }
         }
     }
@@ -349,19 +363,22 @@ void im2a::Asciifier::asciify()
             /* calculate offset */
             ssize_t offset = row * _image->columns() + column;
 
+            /* check for transparency */
+            bool transparent = (buffer[offset * 3 + 2] & 0x1) != 0;
+
             if (_options->pixel()) {
                 /* pixel mode - use box-drawing characters */
                 size_t offset2 = (row + 1) * _image->columns() + column;
-                int color_index = buffer[offset * 2 + 1];
-                int color_index2 = buffer[offset2 * 2 + 1];
+                int color_index = transparent ? -1 : buffer[offset * 3 + 1];
+                int color_index2 = transparent ? -1 : buffer[offset2 * 3 + 1];
                 print_pixel(color_index, color_index2,
                     prev_color, prev_color2);
                 prev_color = color_index;
                 prev_color2 = color_index2;
             } else {
                 /* normal mode - use the charset */
-                int char_index = buffer[offset * 2];
-                int color_index = buffer[offset * 2 + 1];
+                int char_index = buffer[offset * 3];
+                int color_index = transparent ? -1 : buffer[offset * 3 + 1];
                 print_char(charset[char_index % charset_len], color_index,
                     prev_color);
                 prev_color = color_index;
@@ -437,16 +454,26 @@ void im2a::Asciifier::print_footer()
 void im2a::Asciifier::print_char(char c, int color_index, int prev_color)
 {
     if (_options->html()) {
-        if (_options->grayscale()) {
-            color_index = color_index == 0 ? 0 :
-                color_index == 15 ? 1 : color_index - 230;
-        }
+        if (color_index != -1) {
+            if (_options->grayscale()) {
+                color_index = color_index == 0 ? 0 :
+                    color_index == 15 ? 1 : color_index - 230;
+            }
 
-        std::cout << "<span class=\"c_" << std::dec << color_index << "\">" <<
-            c << "</span>";
+            std::cout << "<span class=\"c_" << std::dec << color_index << "\">" <<
+                c << "</span>";
+        } else {
+            std::cout << " ";
+        }
     } else {
         if (color_index != prev_color) {
-            std::cout << "\x1b[38;5;" << color_index << "m";
+            if (color_index != -1) {
+                std::cout << "\x1b[38;5;" << color_index << "m";
+            } else {
+                std::cout << "\x1b[49";
+                c = ' ';
+            }
+
         }
 
         std::cout << c;
@@ -456,13 +483,19 @@ void im2a::Asciifier::print_char(char c, int color_index, int prev_color)
 void im2a::Asciifier::print_pixel(int color_index1, int color_index2,
     int prev_color1, int prev_color2)
 {
-    if (color_index1 != prev_color1 && color_index2 != prev_color2) {
-        std::cout << "\x1b[48;5;" << color_index1 << ";" <<
-            "38;5;" << color_index2 << "m";
-    } else if (color_index1 != prev_color1) {
-        std::cout << "\x1b[48;5;" << color_index1 << "m";
-    } else if (color_index2 != prev_color2) {
-        std::cout << "\x1b[38;5;" << color_index2 << "m";
+    if (color_index1 != prev_color1) {
+        if (color_index1 != -1) {
+            std::cout << "\x1b[48;5;" << color_index1 << "m";
+        } else {
+            std::cout << "\x1b[49";
+        }
+    }
+    if (color_index2 != prev_color2) {
+        if (color_index2 != -1) {
+            std::cout << "\x1b[38;5;" << color_index2 << "m";
+        } else {
+            std::cout << "\x1b[49";
+        }
     }
 
     if (color_index1 == color_index2) {
