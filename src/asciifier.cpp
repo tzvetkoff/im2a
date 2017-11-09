@@ -170,6 +170,11 @@ im2a::Asciifier::Asciifier(Options *options, TermInfo *term_info,
         }
     }
 
+    /* in pixel mode we need an even amount of rows */
+    if (_options->pixel() && scale_height & 1) {
+        ++scale_height;
+    }
+
     /* scale it */
     if (scale_width > 0 && scale_height > 0 &&
         (scale_width != _image->columns() || scale_height != _image->rows())) {
@@ -333,10 +338,12 @@ void im2a::Asciifier::asciify()
 
     /* print image */
     for (ssize_t row = 0; row < _image->rows(); ++row) {
-        /* put some leading spaces if needed */
-        begin_line();
+        /* we can only optimize sequences on the same line */
         int prev_color = -1;
         int prev_color2 = -1;
+
+        /* put some leading spaces if needed */
+        begin_line();
 
         for (ssize_t column = 0; column < _image->columns(); ++column) {
             /* calculate offset */
@@ -347,14 +354,17 @@ void im2a::Asciifier::asciify()
                 size_t offset2 = (row + 1) * _image->columns() + column;
                 int color_index = buffer[offset * 2 + 1];
                 int color_index2 = buffer[offset2 * 2 + 1];
-                print_pixel(color_index, color_index2, prev_color, prev_color2);
+                print_pixel(color_index, color_index2,
+                    prev_color, prev_color2);
                 prev_color = color_index;
                 prev_color2 = color_index2;
             } else {
                 /* normal mode - use the charset */
                 int char_index = buffer[offset * 2];
                 int color_index = buffer[offset * 2 + 1];
-                print_char(charset[char_index % charset_len], color_index);
+                print_char(charset[char_index % charset_len], color_index,
+                    prev_color);
+                prev_color = color_index;
             }
         }
 
@@ -424,29 +434,41 @@ void im2a::Asciifier::print_footer()
     }
 }
 
-void im2a::Asciifier::print_char(char c, int color_index)
+void im2a::Asciifier::print_char(char c, int color_index, int prev_color)
 {
     if (_options->html()) {
         if (_options->grayscale()) {
             color_index = color_index == 0 ? 0 :
                 color_index == 15 ? 1 : color_index - 230;
         }
+
         std::cout << "<span class=\"c_" << std::dec << color_index << "\">" <<
             c << "</span>";
     } else {
-        std::cout << "\x1b[38;5;" << color_index << "m" << c;
+        if (color_index != prev_color) {
+            std::cout << "\x1b[38;5;" << color_index << "m";
+        } else {
+            std::cerr << "hit!\n";
+        }
+
+        std::cout << c;
     }
 }
 
-void im2a::Asciifier::print_pixel(int color_index1, int color_index2, int prev_color1, int prev_color2) {
-    if (color_index1 != prev_color1) {
+void im2a::Asciifier::print_pixel(int color_index1, int color_index2,
+    int prev_color1, int prev_color2)
+{
+    if (color_index1 != prev_color1 && color_index2 != prev_color2) {
+        std::cout << "\x1b[48;5;" << color_index1 << ";" <<
+            "38;5;" << color_index2 << "m";
+    } else if (color_index1 != prev_color1) {
         std::cout << "\x1b[48;5;" << color_index1 << "m";
-    }
-    if (color_index2 != prev_color2) {
+    } else if (color_index2 != prev_color2) {
         std::cout << "\x1b[38;5;" << color_index2 << "m";
     }
+
     if (color_index1 == color_index2) {
-        std::cout <<  " ";
+        std::cout << " ";
     } else {
         std::cout << "▄";
     }
