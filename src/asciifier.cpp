@@ -447,8 +447,6 @@ void im2a::Asciifier::print_char(char c, int color_index, int prev_color)
     } else {
         if (color_index != prev_color) {
             std::cout << "\x1b[38;5;" << color_index << "m";
-        } else {
-            std::cerr << "hit!\n";
         }
 
         std::cout << c;
