@@ -2,8 +2,8 @@
 
 # Define the package version numbers, bug reporting link, project homepage.
 m4_define([IM2A_VERSION_MAJOR_], [0])
-m4_define([IM2A_VERSION_MINOR_], [5])
-m4_define([IM2A_VERSION_PATCH_], [3])
+m4_define([IM2A_VERSION_MINOR_], [6])
+m4_define([IM2A_VERSION_PATCH_], [0])
 m4_define([IM2A_VERSION_STRING_], [IM2A_VERSION_MAJOR_.IM2A_VERSION_MINOR_.IM2A_VERSION_PATCH_])
 m4_define([IM2A_BUGREPORT_URL_], [https://github.com/tzvetkoff/im2a/issues])
 m4_define([IM2A_PROJECT_URL_], [https://github.com/tzvetkoff/im2a])
@@ -30,6 +30,19 @@ AC_PROG_CXX()
 AC_PROG_INSTALL()
 AC_PROG_LN_S()
 AC_PROG_MAKE_SET()
+
+# Debug.
+AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug], [Enable debugging @<:@default=no@:>@.]), [
+  case "${enableval}" in
+    yes) IM2A_DEBUG="1"; CXXFLAGS="${CXXFLAGS} -g -fsanitize=address -fno-omit-frame-pointer";;
+    no)  IM2A_DEBUG="0";;
+    *)   AC_MSG_ERROR(["bad value ${enableval} for feature --enable-debug"]);;
+  esac
+], [
+  IM2A_DEBUG="0"
+])
+AM_CONDITIONAL([DEBUG], [test "x${IM2A_DEBUG}" = "x1"])
+AC_DEFINE_UNQUOTED([DEBUG], [${IM2A_DEBUG}], [Debug mode.])
 
 # Check for curses.
 AC_CHECK_LIB([ncurses], [tgetent],, [

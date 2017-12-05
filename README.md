@@ -36,7 +36,7 @@ brew install tzvetkoff/extras/im2a
 ## Usage
 
 ```
-im2a 0.5.3
+im2a 0.6.0
 
 Convert image files to ASCII art
 Copyright (C) 2013 Latchezar Tzvetkoff
@@ -46,22 +46,24 @@ Usage:
   im2a [options] <file>
 
 Options:
-  -h, --help                  Prints this message
-  -v, --version               Prints version string
-  -m, --html                  Output HTML
-  -i, --invert                Invert the image
-  -t, --center                Center the image
-  -p, --pixel                 Pixel mode
-  -W, --width=N               Set output width
-  -H, --height=M              Set output height
-  -c, --charset=CHARSET       Set output charset
-  -g, --grayscale             Grayscale output instead of 256-color
-  -R, --red-weight=RW         Set red component weight (default: 0.2989)
-  -G, --green-weight=GW       Set green component weight (default: 0.5866)
-  -B, --blue-weight=BW        Set blue component weight (default: 0.1145)
+  -h, --help                        Prints this message
+  -v, --version                     Prints version string
+  -m, --html                        Output HTML
+  -i, --invert                      Invert the image
+  -t, --center                      Center the image
+  -p, --pixel                       Pixel mode
+  -W, --width=N                     Set output width
+  -H, --height=M                    Set output height
+  -c, --charset=CHARSET             Set output charset
+  -g, --grayscale                   Grayscale output instead of 256-color
+  -T, --transparent                 Enable transparency
+  -X, --transparency-threshold=X    Set transparency threshold (default: 1.0)
+  -R, --red-weight=RW               Set red component weight (default: 0.2989)
+  -G, --green-weight=GW             Set green component weight (default: 0.5866)
+  -B, --blue-weight=BW              Set blue component weight (default: 0.1145)
 
 Project homepage: https://github.com/tzvetkoff/im2a
-Report bugs to https://github.com/tzvetkoff/im2a/issues
+Report bugs to: https://github.com/tzvetkoff/im2a/issues
 ```
 
 ## License

@@ -20,6 +20,12 @@
 namespace im2a
 {
 
+    typedef struct {
+        short int color_index;
+        short int char_index;
+        bool transparent;
+    } Pixel;
+
     class Asciifier
     {
 
@@ -30,8 +36,9 @@ namespace im2a
 
         void print_header();
         void print_footer();
-        void print_char(char, int, int);
-        void print_pixel(int, int, int = -1, int = -1);
+        void print_char(im2a::Pixel *, im2a::Pixel *, const char *, int);
+        void print_pixel(im2a::Pixel *, im2a::Pixel *,
+            im2a::Pixel *, im2a::Pixel *);
         void begin_line();
         void feed_line();
 

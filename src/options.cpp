@@ -33,6 +33,8 @@ im2a::Options::Options(int argc, char *const *argv)
     _height = 0;
     _charset = NULL;
     _grayscale = false;
+    _transparent = false;
+    _transparency_threshold = 1.0000f;
     _red_weight = 0.2989f;
     _green_weight = 0.5866f;
     _blue_weight = 0.1145f;
@@ -50,6 +52,8 @@ im2a::Options::Options(int argc, char *const *argv)
         {"height", required_argument, NULL, 'H'},
         {"charset", required_argument, NULL, 'c'},
         {"grayscale", no_argument, NULL, 'g'},
+        {"transparent", no_argument, NULL, 'T'},
+        {"transparency-threshold", required_argument, NULL, 'X'},
         {"red-weight", required_argument, NULL, 'R'},
         {"green-weight", required_argument, NULL, 'G'},
         {"blue-weight", required_argument, NULL, 'B'},
@@ -57,7 +61,7 @@ im2a::Options::Options(int argc, char *const *argv)
     };
 
     /* parse comment line options */
-    while ((ch = getopt_long(argc, argv, "hvmitpW:H:c:gR:G:B:", longopts,
+    while ((ch = getopt_long(argc, argv, "hvmitpW:H:c:gTX:R:G:B:", longopts,
         NULL)) != -1) {
         switch (ch) {
             case 'h':
@@ -117,6 +121,14 @@ im2a::Options::Options(int argc, char *const *argv)
 
             case 'g':
                 _grayscale = true;
+                break;
+
+            case 'T':
+                _transparent = true;
+                break;
+
+            case 'X':
+                _transparency_threshold = atof(optarg);
                 break;
 
             case 'R':
@@ -185,26 +197,34 @@ void im2a::Options::usage(std::ostream &out, int exit_code)
     out << "  " << _name << " [options] <file>" << std::endl;
     out << std::endl;
     out << "Options:" << std::endl;
-    out << "  -h, --help                  Prints this message" << std::endl;
-    out << "  -v, --version               Prints version string" << std::endl;
-    out << "  -m, --html                  Output HTML" << std::endl;
-    out << "  -i, --invert                Invert the image" << std::endl;
-    out << "  -t, --center                Center the image" << std::endl;
-    out << "  -p, --pixel                 Pixel mode" << std::endl;
-    out << "  -W, --width=N               Set output width" << std::endl;
-    out << "  -H, --height=M              Set output height" << std::endl;
-    out << "  -c, --charset=CHARSET       Set output charset" << std::endl;
-    out << "  -g, --grayscale             Grayscale output instead"
+    out << "  -h, --help                        Prints this message" <<
+        std::endl;
+    out << "  -v, --version                     Prints version string" <<
+        std::endl;
+    out << "  -m, --html                        Output HTML" << std::endl;
+    out << "  -i, --invert                      Invert the image" << std::endl;
+    out << "  -t, --center                      Center the image" << std::endl;
+    out << "  -p, --pixel                       Pixel mode" << std::endl;
+    out << "  -W, --width=N                     Set output width" << std::endl;
+    out << "  -H, --height=M                    Set output height" <<
+        std::endl;
+    out << "  -c, --charset=CHARSET             Set output charset" <<
+        std::endl;
+    out << "  -g, --grayscale                   Grayscale output instead"
         " of 256-color" << std::endl;
-    out << "  -R, --red-weight=RW         Set red component weight"
+    out << "  -T, --transparent                 Enable transparency" <<
+        std::endl;
+    out << "  -X, --transparency-threshold=X    Set transparency threshold"
+        " (default: 1.0)" << std::endl;
+    out << "  -R, --red-weight=RW               Set red component weight"
         " (default: 0.2989)" << std::endl;
-    out << "  -G, --green-weight=GW       Set green component weight"
+    out << "  -G, --green-weight=GW             Set green component weight"
         " (default: 0.5866)" << std::endl;
-    out << "  -B, --blue-weight=BW        Set blue component weight"
+    out << "  -B, --blue-weight=BW              Set blue component weight"
         " (default: 0.1145)" << std::endl;
     out << std::endl;
     out << "Project homepage: " IM2A_PROJECT_URL << std::endl;
-    out << "Report bugs to " IM2A_BUGREPORT_URL << std::endl;
+    out << "Report bugs to: " IM2A_BUGREPORT_URL << std::endl;
 
     exit(exit_code);
 }
@@ -246,6 +266,16 @@ char *im2a::Options::charset() const
 bool im2a::Options::grayscale() const
 {
     return _grayscale;
+}
+
+bool im2a::Options::transparent() const
+{
+    return _transparent;
+}
+
+double im2a::Options::transparency_threshold() const
+{
+    return _transparency_threshold;
 }
 
 double im2a::Options::red_weight() const

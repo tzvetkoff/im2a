@@ -21,17 +21,17 @@ AC_DEFUN([AX_CHECK_IMAGEMAGICK], [
   IMAGEMAGICK_CXXFLAGS=""
 
   AC_ARG_WITH([magick++-config], AC_HELP_STRING([--with-magick++-config=path], [Provide path to Magick++-config.]), [
-    ac_imagemagick="${withval}"
+    ac_imagemagick_config="${withval}"
   ], [
-    ac_imagemagick="auto"
+    ac_imagemagick_config="auto"
   ])
 
   AC_MSG_CHECKING([for ImageMagick++])
 
   # Try to find Magick++-config in common directories.
-  if test "x$ac_imagemagick" = "xauto"; then
-    imagemagick_config_dirs="/usr/bin /usr/local/bin /usr/local/imagemagick/bin /opt/imagemagick/bin"
-    AC_FIND_FILE(Magick++-config, ${imagemagick_config_dirs}, ac_imagemagick_config_dir)
+  if test "x${ac_imagemagick_config}" = "xauto"; then
+    ac_imagemagick_config_dirs="/usr/bin /usr/local/bin /usr/local/imagemagick/bin /opt/imagemagick/bin"
+    AC_FIND_FILE(Magick++-config, ${ac_imagemagick_config_dirs}, ac_imagemagick_config_dir)
 
     if test "x${ac_imagemagick_config_dir}" = "xno"; then
       ac_imagemagick="no"
@@ -39,22 +39,22 @@ AC_DEFUN([AX_CHECK_IMAGEMAGICK], [
       IMAGEMAGICK_LDFLAGS=`${ac_imagemagick_config_dir}/Magick++-config --ldflags 2>/dev/null`
       IMAGEMAGICK_CXXFLAGS=`${ac_imagemagick_config_dir}/Magick++-config --cxxflags 2>/dev/null`
 
-      if test "x$IMAGEMAGICK_LDFLAGS" = "x" -a "x$IMAGEMAGICK_CXXFLAGS" = "x"; then
+      if test "x${IMAGEMAGICK_LDFLAGS}" = "x" -a "x${IMAGEMAGICK_CXXFLAGS}" = "x"; then
         ac_imagemagick="no"
       else
         ac_imagemagick="yes"
       fi
     fi
   else
-    IMAGEMAGICK_LDFLAGS=`${ac_imagemagick} --ldflags 2>/dev/null`
-    IMAGEMAGICK_CXXFLAGS=`${ac_imagemagick} --cxxflags 2>/dev/null`
+    IMAGEMAGICK_LDFLAGS=`${ac_imagemagick_config} --ldflags 2>/dev/null`
+    IMAGEMAGICK_CXXFLAGS=`${ac_imagemagick_config} --cxxflags 2>/dev/null`
 
-    if test "x$IMAGEMAGICK_LDFLAGS" = "x" -a "x$IMAGEMAGICK_CXXFLAGS" = "x"; then
+    if test "x${IMAGEMAGICK_LDFLAGS}" = "x" -a "x${IMAGEMAGICK_CXXFLAGS}" = "x"; then
       ac_imagemagick="no"
     else
       ac_imagemagick="yes"
     fi
   fi
 
-  AC_MSG_RESULT([$ac_imagemagick])
+  AC_MSG_RESULT([${ac_imagemagick}])
 ])

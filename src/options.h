@@ -29,6 +29,8 @@ namespace im2a
         int _height;
         char *_charset;
         bool _grayscale;
+        bool _transparent;
+        double _transparency_threshold;
         double _red_weight;
         double _green_weight;
         double _blue_weight;
@@ -48,6 +50,8 @@ namespace im2a
         int height() const;
         char *charset() const;
         bool grayscale() const;
+        bool transparent() const;
+        double transparency_threshold() const;
         double red_weight() const;
         double green_weight() const;
         double blue_weight() const;

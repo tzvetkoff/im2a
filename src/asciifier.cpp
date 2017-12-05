@@ -20,6 +20,9 @@
 
 #include "asciifier.h"
 
+/* max quantum value */
+#define MAGICK_QUANTUM_MAX ((1 << MAGICKCORE_QUANTUM_DEPTH) - 1)
+
 /* 256-color color values, hex */
 static unsigned int TERM_COLORS_HEX_256[256] = {
     0x000000, 0x800000, 0x008000, 0x808000, 0x000080, 0x800080, 0x008080,
@@ -209,8 +212,8 @@ void im2a::Asciifier::asciify()
     }
 
     /* allocate a buffer for color index and output char */
-    unsigned char *buffer = (unsigned char *)malloc(_image->columns() *
-        _image->rows() * 2);
+    im2a::Pixel *buffer = (im2a::Pixel *)calloc(_image->columns() *
+        _image->rows(), sizeof(im2a::Pixel));
 
     /* pixel packet */
 #if MagickLibVersion >= 0x700
@@ -229,6 +232,22 @@ void im2a::Asciifier::asciify()
     /* grayscale or not */
     bool grayscale = _options->grayscale();
 
+    /* transparency support */
+#if MagickLibVersion >= 0x700
+    bool transparent = _options->transparent() && _image->alpha();
+    int alpha_idx = transparent ?
+        MagickCore::GetPixelChannelOffset(_image->image(),
+            MagickCore::AlphaPixelChannel) : -1;
+    /* in imagemagick-7 the alpha channel is actually opacity ;[ */
+    Magick::Quantum transparency_threshold =
+        (1.0f - _options->transparency_threshold()) * MAGICK_QUANTUM_MAX;
+#else
+    bool transparent = _options->transparent() && _image->matte();
+    /* in imagemagick-6 the opacity is actually alpha ;{ */
+    Magick::Quantum transparency_threshold =
+        _options->transparency_threshold() * MAGICK_QUANTUM_MAX;
+#endif
+
     /* walk */
     for (ssize_t row = 0; row < _image->rows(); ++row) {
         for (ssize_t column = 0; column < _image->columns(); ++column) {
@@ -242,12 +261,17 @@ void im2a::Asciifier::asciify()
             Magick::Quantum gs = red_weight * (double)(pixel[0])
                                + green_weight * (double)(pixel[1])
                                + blue_weight * (double)(pixel[2]);
+            if (transparent && pixel[alpha_idx] <= transparency_threshold) {
+                buffer[offset].transparent = 1;
+            }
 #else
             Magick::PixelPacket *pixel = pixels + offset;
             Magick::Quantum gs = red_weight * pixel->red
                                + green_weight * pixel->green
                                + blue_weight * pixel->blue;
-
+            if (transparent && pixel->opacity >= transparency_threshold) {
+                buffer[offset].transparent = 1;
+            }
 #endif
 
             /* start with an impossibly long distance */
@@ -284,14 +308,14 @@ void im2a::Asciifier::asciify()
 
             /* store the char index */
             unsigned char char_index = idx;
-            buffer[offset * 2] = char_index;
+            buffer[offset].char_index = char_index;
 
             /* if grayscale, store the resulted color index too, otherwise
                go and calculate it from the 256 colors */
             if (grayscale) {
                 unsigned char color_index =
                     (idx == 0 ? 0 : idx == 1 ? 15 : idx + 230) & 0xFF;
-                buffer[offset * 2 + 1] = color_index;
+                buffer[offset].color_index = color_index;
             } else {
                 /* start with an impossibly long distance again */
                 min = 0xFFFFFFFF;
@@ -324,7 +348,7 @@ void im2a::Asciifier::asciify()
 
                 /* store the color index */
                 unsigned char color_index = idx & 0xFF;
-                buffer[offset * 2 + 1] = color_index;
+                buffer[offset].color_index = color_index;
             }
         }
     }
@@ -339,8 +363,9 @@ void im2a::Asciifier::asciify()
     /* print image */
     for (ssize_t row = 0; row < _image->rows(); ++row) {
         /* we can only optimize sequences on the same line */
-        int prev_color = -1;
-        int prev_color2 = -1;
+        im2a::Pixel empty = {-1, -1, 0};
+        im2a::Pixel *prev_color = &empty;
+        im2a::Pixel *prev_color2 = &empty;
 
         /* put some leading spaces if needed */
         begin_line();
@@ -352,19 +377,14 @@ void im2a::Asciifier::asciify()
             if (_options->pixel()) {
                 /* pixel mode - use box-drawing characters */
                 size_t offset2 = (row + 1) * _image->columns() + column;
-                int color_index = buffer[offset * 2 + 1];
-                int color_index2 = buffer[offset2 * 2 + 1];
-                print_pixel(color_index, color_index2,
+                print_pixel(buffer + offset, buffer + offset2,
                     prev_color, prev_color2);
-                prev_color = color_index;
-                prev_color2 = color_index2;
+                prev_color = buffer + offset;
+                prev_color2 = buffer + offset2;
             } else {
                 /* normal mode - use the charset */
-                int char_index = buffer[offset * 2];
-                int color_index = buffer[offset * 2 + 1];
-                print_char(charset[char_index % charset_len], color_index,
-                    prev_color);
-                prev_color = color_index;
+                print_char(buffer + offset, prev_color, charset, charset_len);
+                prev_color = buffer + offset;
             }
         }
 
@@ -434,39 +454,65 @@ void im2a::Asciifier::print_footer()
     }
 }
 
-void im2a::Asciifier::print_char(char c, int color_index, int prev_color)
+void im2a::Asciifier::print_char(im2a::Pixel *current, im2a::Pixel *prev,
+    const char *charset, int charset_len)
 {
+    char c = charset[current->char_index % charset_len];
+
     if (_options->html()) {
+        int color_index = current->color_index;
+
         if (_options->grayscale()) {
-            color_index = color_index == 0 ? 0 :
-                color_index == 15 ? 1 : color_index - 230;
+            color_index = current->color_index == 0 ? 0 :
+                current->color_index == 15 ? 1 : current->color_index - 230;
+            c = charset[color_index];
         }
 
-        std::cout << "<span class=\"c_" << std::dec << color_index << "\">" <<
-            c << "</span>";
+        if (current->transparent) {
+            std::cout << " ";
+        } else {
+            std::cout << "<span class=\"c_" <<
+                std::dec << color_index << "\">" << c << "</span>";
+        }
     } else {
-        if (color_index != prev_color) {
-            std::cout << "\x1b[38;5;" << color_index << "m";
-        }
+        if (current->transparent) {
+            if (!prev->transparent) {
+                std::cout << "\x1b[49m";
+            }
 
-        std::cout << c;
+            std::cout << " ";
+        } else {
+            if (current->color_index != prev->color_index) {
+                std::cout << "\x1b[38;5;" << current->color_index << "m";
+            }
+
+            std::cout << c;
+        }
     }
 }
 
-void im2a::Asciifier::print_pixel(int color_index1, int color_index2,
-    int prev_color1, int prev_color2)
+void im2a::Asciifier::print_pixel(Pixel *current1, Pixel *current2,
+    Pixel *prev1, Pixel *prev2)
 {
-    if (color_index1 != prev_color1 && color_index2 != prev_color2) {
-        std::cout << "\x1b[48;5;" << color_index1 << ";" <<
-            "38;5;" << color_index2 << "m";
-    } else if (color_index1 != prev_color1) {
-        std::cout << "\x1b[48;5;" << color_index1 << "m";
-    } else if (color_index2 != prev_color2) {
-        std::cout << "\x1b[38;5;" << color_index2 << "m";
+    if (current1->color_index != prev1->color_index || current1->transparent != prev1->transparent) {
+        if (current1->transparent) {
+            std::cout << "\x1b[49m";
+        } else {
+            std::cout << "\x1b[48;5;" << current1->color_index << "m";
+        }
+    }
+    if (current2->color_index != prev2->color_index || current2->transparent != prev2->transparent) {
+        if (current2->transparent) {
+            std::cout << "\x1b[39m";
+        } else {
+            std::cout << "\x1b[38;5;" << current2->color_index << "m";
+        }
     }
 
-    if (color_index1 == color_index2) {
+    if (current1->color_index == current2->color_index || (current1->transparent && current2->transparent)) {
         std::cout << " ";
+    } else if (current1->transparent) {
+        std::cout << "▀";
     } else {
         std::cout << "▄";
     }
