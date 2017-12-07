@@ -275,7 +275,7 @@ void im2a::Asciifier::asciify()
 #endif
 
             /* start with an impossibly long distance */
-            double min = 0xFFFFFFFF;
+            double min = INFINITY;
 
             /* selected index */
             int idx = 0;
@@ -318,7 +318,7 @@ void im2a::Asciifier::asciify()
                 buffer[offset].color_index = color_index;
             } else {
                 /* start with an impossibly long distance again */
-                min = 0xFFFFFFFF;
+                min = INFINITY;
 
                 /* walk the 256 terminal colors */
                 for (int index = 0; index < 256; ++index) {
@@ -494,14 +494,16 @@ void im2a::Asciifier::print_char(im2a::Pixel *current, im2a::Pixel *prev,
 void im2a::Asciifier::print_pixel(Pixel *current1, Pixel *current2,
     Pixel *prev1, Pixel *prev2)
 {
-    if (current1->color_index != prev1->color_index || current1->transparent != prev1->transparent) {
+    if (current1->color_index != prev1->color_index ||
+        current1->transparent != prev1->transparent) {
         if (current1->transparent) {
             std::cout << "\x1b[49m";
         } else {
             std::cout << "\x1b[48;5;" << current1->color_index << "m";
         }
     }
-    if (current2->color_index != prev2->color_index || current2->transparent != prev2->transparent) {
+    if (current2->color_index != prev2->color_index ||
+        current2->transparent != prev2->transparent) {
         if (current2->transparent) {
             std::cout << "\x1b[39m";
         } else {
@@ -509,7 +511,8 @@ void im2a::Asciifier::print_pixel(Pixel *current1, Pixel *current2,
         }
     }
 
-    if (current1->color_index == current2->color_index || (current1->transparent && current2->transparent)) {
+    if (current1->color_index == current2->color_index ||
+        (current1->transparent && current2->transparent)) {
         std::cout << " ";
     } else if (current1->transparent) {
         std::cout << "▀";

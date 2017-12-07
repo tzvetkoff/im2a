@@ -45,9 +45,11 @@ Distributed under The Beerware License
 Usage:
   im2a [options] <file>
 
-Options:
+Common options:
   -h, --help                        Prints this message
   -v, --version                     Prints version string
+
+Specific options:
   -m, --html                        Output HTML
   -i, --invert                      Invert the image
   -t, --center                      Center the image

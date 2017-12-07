@@ -189,18 +189,24 @@ void im2a::Options::usage(std::ostream &out, int exit_code)
 {
     out << PACKAGE_NAME << " " IM2A_VERSION_STRING << std::endl;
     out << std::endl;
+
     out << "Convert image files to ASCII art" << std::endl;
     out << "Copyright (C) 2013 Latchezar Tzvetkoff" << std::endl;
     out << "Distributed under The Beerware License" << std::endl;
     out << std::endl;
+
     out << "Usage:" << std::endl;
     out << "  " << _name << " [options] <file>" << std::endl;
     out << std::endl;
-    out << "Options:" << std::endl;
+
+    out << "Common options:" << std::endl;
     out << "  -h, --help                        Prints this message" <<
         std::endl;
     out << "  -v, --version                     Prints version string" <<
         std::endl;
+    out << std::endl;
+
+    out << "Specific options:" << std::endl;
     out << "  -m, --html                        Output HTML" << std::endl;
     out << "  -i, --invert                      Invert the image" << std::endl;
     out << "  -t, --center                      Center the image" << std::endl;
@@ -223,6 +229,7 @@ void im2a::Options::usage(std::ostream &out, int exit_code)
     out << "  -B, --blue-weight=BW              Set blue component weight"
         " (default: 0.1145)" << std::endl;
     out << std::endl;
+
     out << "Project homepage: " IM2A_PROJECT_URL << std::endl;
     out << "Report bugs to: " IM2A_BUGREPORT_URL << std::endl;
 
