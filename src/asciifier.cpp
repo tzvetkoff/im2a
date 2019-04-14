@@ -423,7 +423,7 @@ void im2a::Asciifier::print_header()
         std::cout << "pre { font: normal 12px/9px Menlo, monospace; }" <<
             std::endl;
         if (_options->center()) {
-            std::cout << "pre { text-aling: center; }" << std::endl;
+            std::cout << "pre { text-align: center; }" << std::endl;
         }
         if (_options->grayscale()) {
             for (int x = 0; x < 26; ++x) {
