@@ -35,6 +35,7 @@ stamp-h1
 *.png
 *.jpg
 *.gif
+*.html
 
 # Just in case
 /tmp

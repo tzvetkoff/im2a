@@ -414,32 +414,30 @@ void im2a::Asciifier::print_header()
         std::cout << "  <meta http-equiv=\"Content-Type\""
             " content=\"text/html; charset=UTF-8\" />" << std::endl;
         std::cout << "  <title>im2a asciified image</title>" << std::endl;
-        std::cout << "</head>" << std::endl;
-        std::cout << std::endl;
-        std::cout << "<body>" << std::endl;
-        std::cout << std::endl;
-        std::cout << "<style type=\"text/css\">" << std::endl;
-        std::cout << "body { background: #000000; }" << std::endl;
-        std::cout << "pre { font: normal 12px/9px Menlo, monospace; }" <<
+        std::cout << "  <style type=\"text/css\">" << std::endl;
+        std::cout << "    body { background: #000000; }" << std::endl;
+        std::cout << "    pre { font: normal 12px/9px Menlo, monospace; }" <<
             std::endl;
         if (_options->center()) {
-            std::cout << "pre { text-align: center; }" << std::endl;
+            std::cout << "    pre { text-align: center; }" << std::endl;
         }
         if (_options->grayscale()) {
             for (int x = 0; x < 26; ++x) {
-                std::cout << ".c_" << std::dec << x << " { color: #" <<
+                std::cout << "    .c_" << std::dec << x << " { color: #" <<
                     std::hex << std::setw(6) << std::setfill('0') <<
                     TERM_COLORS_HEX_GS[x] << "; }" << std::endl;
             }
         } else {
             for (int x = 0; x < 256; ++x) {
-                std::cout << ".c_" << std::dec << x << " { color: #" <<
+                std::cout << "    .c_" << std::dec << x << " { color: #" <<
                     std::hex << std::setw(6) << std::setfill('0') <<
                     TERM_COLORS_HEX_256[x] << "; }" << std::endl;
             }
         }
-        std::cout << "</style>" << std::endl;
+        std::cout << "  </style>" << std::endl;
+        std::cout << "</head>" << std::endl;
         std::cout << std::endl;
+        std::cout << "<body>" << std::endl;
         std::cout << "<pre>" << std::endl;
     }
 }
@@ -448,9 +446,9 @@ void im2a::Asciifier::print_footer()
 {
     if (_options->html()) {
         std::cout << "</pre>" << std::endl;
-        std::cout << std::endl;
         std::cout << "</body>" << std::endl;
         std::cout << "</html>" << std::endl;
+        std::cout << "<!-- im2a v" IM2A_VERSION_STRING " -->" << std::endl;
     }
 }
 
