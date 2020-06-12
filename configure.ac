@@ -3,7 +3,7 @@
 # Define the package version numbers, bug reporting link, project homepage.
 m4_define([IM2A_VERSION_MAJOR_], [0])
 m4_define([IM2A_VERSION_MINOR_], [6])
-m4_define([IM2A_VERSION_PATCH_], [1])
+m4_define([IM2A_VERSION_PATCH_], [2])
 m4_define([IM2A_VERSION_STRING_], [IM2A_VERSION_MAJOR_.IM2A_VERSION_MINOR_.IM2A_VERSION_PATCH_])
 m4_define([IM2A_BUGREPORT_URL_], [https://github.com/tzvetkoff/im2a/issues])
 m4_define([IM2A_PROJECT_URL_], [https://github.com/tzvetkoff/im2a])
@@ -54,13 +54,17 @@ AC_CHECK_LIB([ncurses], [tgetnum],, [
 
 # Check for ImageMagick C++ bindings.
 AX_CHECK_IMAGEMAGICK()
+AC_DEFINE_UNQUOTED([IMAGEMAGICK_VERSION], [${IMAGEMAGICK_VERSION}], [ImageMagick version.])
 
 if test x"$ac_imagemagick" != "xyes"; then
   AC_MSG_ERROR([ImageMagick C++ bindings not found. Please install ImageMagick with C++ bindings or use --with-magick++-config=path.])
 fi
 
+AC_SUBST([IMAGEMAGICK_CPPFLAGS])
 AC_SUBST([IMAGEMAGICK_CXXFLAGS])
 AC_SUBST([IMAGEMAGICK_LDFLAGS])
+AC_SUBST([IMAGEMAGICK_LDADD])
+AC_SUBST([IMAGEMAGICK_VERSION])
 
 # Makefiles.
 AC_CONFIG_FILES([Makefile src/Makefile])
