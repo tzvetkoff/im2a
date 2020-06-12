@@ -32,4 +32,4 @@ namespace im2a
 
 }
 
-#endif /* defined(__im2a__term_info__) */
+#endif /* !defined(__im2a__term_info__) */

@@ -61,4 +61,4 @@ namespace im2a
 
 }
 
-#endif /* defined(__im2a__options__) */
+#endif /* !defined(__im2a__options__) */

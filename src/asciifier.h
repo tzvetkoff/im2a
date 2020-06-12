@@ -50,4 +50,4 @@ namespace im2a
 
 }
 
-#endif /* defined(__im2a__asciifier__) */
+#endif /* !defined(__im2a__asciifier__) */

@@ -69,7 +69,7 @@ im2a::Options::Options(int argc, char *const *argv)
                 break;
 
             case 'v':
-                std::cout << IM2A_VERSION_STRING << std::endl;
+                std::cout << PROJECT_VERSION << std::endl;
                 exit(EXIT_SUCCESS);
 
             case 'm':
@@ -187,7 +187,7 @@ im2a::Options::~Options()
 
 void im2a::Options::usage(std::ostream &out, int exit_code)
 {
-    out << PACKAGE_NAME << " " IM2A_VERSION_STRING << std::endl;
+    out << PROJECT_NAME << " " PROJECT_VERSION << std::endl;
     out << std::endl;
 
     out << "Convert image files to ASCII art" << std::endl;
@@ -230,8 +230,8 @@ void im2a::Options::usage(std::ostream &out, int exit_code)
         " (default: 0.1145)" << std::endl;
     out << std::endl;
 
-    out << "Project homepage: " IM2A_PROJECT_URL << std::endl;
-    out << "Report bugs to: " IM2A_BUGREPORT_URL << std::endl;
+    out << "Project homepage: " PROJECT_HOMEPAGE_URL << std::endl;
+    out << "Report bugs to: " PROJECT_BUGREPORT_URL << std::endl;
 
     exit(exit_code);
 }

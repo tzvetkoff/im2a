@@ -216,7 +216,7 @@ void im2a::Asciifier::asciify()
         _image->rows(), sizeof(im2a::Pixel));
 
     /* pixel packet */
-#if IMAGEMAGICK_VERSION >= 0x7
+#if IMAGEMAGICK_VERSION_MAJOR >= 0x7
     Magick::Quantum *pixels = _image->getPixels(0, 0, _image->columns(),
         _image->rows());
 #else
@@ -233,7 +233,7 @@ void im2a::Asciifier::asciify()
     bool grayscale = _options->grayscale();
 
     /* transparency support */
-#if IMAGEMAGICK_VERSION >= 0x7
+#if IMAGEMAGICK_VERSION_MAJOR >= 0x7
     bool transparent = _options->transparent() && _image->alpha();
     int alpha_idx = transparent ?
         MagickCore::GetPixelChannelOffset(_image->image(),
@@ -255,7 +255,7 @@ void im2a::Asciifier::asciify()
             ssize_t offset = row * _image->columns() + column;
 
             /* get pixel's grayscale values */
-#if IMAGEMAGICK_VERSION >= 0x7
+#if IMAGEMAGICK_VERSION_MAJOR >= 0x7
             Magick::Quantum *pixel = pixels +
                 offset * MagickCore::GetPixelChannels(_image->image());
             Magick::Quantum gs = red_weight * (double)(pixel[0])
@@ -286,7 +286,7 @@ void im2a::Asciifier::asciify()
                 Magick::Color *color = &TERM_COLORS_GS[index];
 
                 /* calculate distance */
-#if IMAGEMAGICK_VERSION >= 0x7
+#if IMAGEMAGICK_VERSION_MAJOR >= 0x7
                 double distance = sqrt(
                     pow(color->quantumRed() - gs, 2) +
                     pow(color->quantumGreen() - gs, 2) +
@@ -325,7 +325,7 @@ void im2a::Asciifier::asciify()
                     /* get the color itself */
                     Magick::Color *color = &TERM_COLORS_256[index];
 
-#if IMAGEMAGICK_VERSION >= 0x7
+#if IMAGEMAGICK_VERSION_MAJOR >= 0x7
                     double distance = sqrt(
                         pow(color->quantumRed() - pixel[0], 2) +
                         pow(color->quantumGreen() - pixel[1], 2) +
@@ -448,7 +448,7 @@ void im2a::Asciifier::print_footer()
         std::cout << "</pre>" << std::endl;
         std::cout << "</body>" << std::endl;
         std::cout << "</html>" << std::endl;
-        std::cout << "<!-- im2a v" IM2A_VERSION_STRING " -->" << std::endl;
+        std::cout << "<!-- im2a v" PROJECT_VERSION " -->" << std::endl;
     }
 }
 

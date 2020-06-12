@@ -1,0 +1,26 @@
+/*
+ * ----------------------------------------------------------------------------
+ * "THE BEER-WARE LICENSE" (Revision 42):
+ * <Latchezar Tzvetkoff> wrote this file. As long as you retain this notice you
+ * can do whatever you want with this stuff. If we meet some day, and you think
+ * this stuff is worth it, you can buy me a beer in return. Latchezar Tzvetkoff
+ * ----------------------------------------------------------------------------
+ */
+
+/* config.h */
+
+#ifndef __im2a_config__
+#define __im2a_config__
+
+/* Project defines */
+#define PROJECT_NAME                "@PROJECT_NAME@"
+#define PROJECT_VERSION             "@PROJECT_VERSION@"
+#define PROJECT_HOMEPAGE_URL        "@PROJECT_HOMEPAGE_URL@"
+#define PROJECT_BUGREPORT_URL       "@BUGREPORT_URL@"
+
+/* ImageMagick defines */
+#define IMAGEMAGICK_VERSION_MAJOR   @IMAGEMAGICK_VERSION_MAJOR@
+#define IMAGEMAGICK_VERSION_MINOR   @IMAGEMAGICK_VERSION_MINOR@
+#define IMAGEMAGICK_VERSION_PATCH   @IMAGEMAGICK_VERSION_PATCH@
+
+#endif /* !defined(__im2a_config__) */
