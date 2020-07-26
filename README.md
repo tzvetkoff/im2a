@@ -25,14 +25,6 @@ Just like any other program that uses Autotools:
 make install
 ```
 
-### MacOS X
-
-If you're using [Homebrew](http://brew.sh/) just type this in your terminal:
-
-``` bash
-brew install tzvetkoff/extras/im2a
-```
-
 ## Usage
 
 ```
@@ -43,7 +35,7 @@ Copyright (C) 2013 Latchezar Tzvetkoff
 Distributed under The Beerware License
 
 Usage:
-  ./build/bin/im2a [options] <file>
+  im2a [options] <file>
 
 Common options:
   -h, --help                        Prints this message
